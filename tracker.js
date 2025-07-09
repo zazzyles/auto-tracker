@@ -1,0 +1,62 @@
+$(document).ready(function () {
+  const {
+    characterName,
+    memberID,
+    ignoreForumIDs = [],
+    archiveForumIDs = [],
+    showPostDate = true,
+    showPartners = true,
+    showLastReply = true
+  } = trackerParams;
+
+  const url = `https://basgiathrp.jcink.net/index.php?act=Search&CODE=gettopicsuser&mid=${memberID}`;
+
+  $.get(url, function (data) {
+    const html = $(data);
+    const rows = html.find(".tableborder tr");
+    let active = [], complete = [];
+
+    rows.each(function () {
+      const topicLink = $(this).find("a[href*='showtopic']");
+      const forumLink = $(this).find("a[href*='showforum']");
+      const forumID = parseInt(forumLink.attr("href")?.match(/showforum=(\d+)/)?.[1]);
+
+      if (!topicLink.length || ignoreForumIDs.includes(forumID)) return;
+
+      const title = topicLink.text();
+      const href = topicLink.attr("href");
+      const text = $(this).text();
+
+      const dateMatch = text.match(/\w+\s+\d{1,2}\s+\d{4},\s+\d+:\d+\s[APM]+/);
+      const lastPoster = $(this).find("a").last().text();
+
+      const line = [`<li><a href="${href}" target="_blank">${title}</a>`];
+
+      if (showPostDate && dateMatch) line.push(`📅 ${dateMatch[0]}`);
+      if (showLastReply && lastPoster) line.push(`🔁 ${lastPoster}`);
+      if (showPartners) {
+        const partnerMatch = text.match(/Started by\s(.+?)\s/);
+        if (partnerMatch && partnerMatch[1] !== characterName) {
+          line.push(`👥 ${partnerMatch[1]}`);
+        }
+      }
+
+      line.push(`</li>`);
+
+      if (archiveForumIDs.includes(forumID)) {
+        complete.push(line.join(" "));
+      } else {
+        active.push(line.join(" "));
+      }
+    });
+
+    const output = `
+      <h3>📖 Active Threads</h3>
+      <ul>${active.join("") || "<li>No active threads</li>"}</ul>
+      <h3>✅ Completed Threads</h3>
+      <ul>${complete.join("") || "<li>No completed threads</li>"}</ul>
+    `;
+
+    $("#tracker-output").html(output);
+  });
+});
