@@ -1,2 +1,22 @@
 # auto-tracker
 for auto tracker
+[dohtml]
+<div id="elio-tracker">
+  <h2>🧭 Thread Tracker: Elio Boneheart</h2>
+  <div id="tracker-output">Loading threads...</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<script>
+  const trackerParams = {
+    characterName: "Elio Boneheart",
+    memberID: 7,
+    ignoreForumIDs: [152, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 168],
+    archiveForumIDs: [58],
+    showPostDate: true,
+    showPartners: true,
+    showLastReply: true
+  };
+</script>
+<script src="https://yourdomain.com/path/to/elio-autotracker.js"></script>
+[/dohtml]
