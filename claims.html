@@ -1,0 +1,352 @@
+<article class="guidebook">
+  <section class="postTopBar">
+    <div class="borderTop"></div>
+    <div class="postTopWrap">
+      <div class="fIcon">
+        <div class="fImg">
+          <div class="fAv" style="background-image: url(https://i.pinimg.com/736x/49/62/dc/4962dce55141f2c22698dce87a6d5ab2.jpg);">
+          </div>
+        </div>
+      </div>
+      <div class="postName">
+        <h2>
+          Claims Directory
+        </h2>
+        <div class="playedBy">
+         An Epic fantasy style roleplaying site set within Basgiath War College — where students are soldiers, dragons choose their riders, and death is always watching.
+        </div>
+        <nav role="tablist" aria-labelledby="tablist-1" class="manual">
+          <button id="tab-1" type="button" role="tab" aria-selected="true"
+           aria-controls="tabpanel-1">Face Claim</button>
+          <button id="tab-2" type="button" role="tab" aria-selected="false"
+           aria-controls="tabpanel-2" tabindex="-1">Magic Claim</button>
+          <button id="tab-3" type="button" role="tab" aria-selected="false"
+           aria-controls="tabpanel-3" tabindex="-1">Bonded Claim</button>
+        </nav>
+      </div>
+    </div>
+    <div class="borderBot"></div>
+  </section>
+
+  <section class="guidebookCon">
+    <div class="borderTop"></div>
+    <div class="content-container">
+      <section id="tabpanel-1" role="tabpanel" aria-labelledby="tab-1">
+        <div class="tabContainer" id="fc-directory">
+  		<p>Loading face claims...</p>
+        </div>
+      </section>
+      <section id="tabpanel-2" role="tabpanel" aria-labelledby="tab-2" class="is-hidden">
+	<div class="tabContainer" id="magic-directory">
+  		<p>Loading magic claims...</p>
+        </div>
+      </section>
+      <section id="tabpanel-3" role="tabpanel" aria-labelledby="tab-3" class="is-hidden">
+	<div class="tabContainer" id="dragon-directory">
+  		<p>Loading dragon & gryphon claims...</p>
+        </div>
+      </section>
+    </div>
+    <div class="borderBot"></div>
+  </section>
+</article>
+
+
+<script>
+// https://accessible-components.sparkbox.com/tabs
+let tabsList = Array.from(document.querySelectorAll("[role=tab]"));
+let tabPanels = Array.from(document.querySelectorAll("[role=tabpanel]"));
+
+// Shows the selected tab
+const togglePanel = (tabPanel) => {
+  resetHiddenTabPanels();
+  tabPanel.classList.remove("is-hidden");
+};
+
+// Add click event to tab buttons
+tabsList.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    let tabPanel = document.getElementById(tab.getAttribute("aria-controls"));
+    resetActiveTabs();
+    resetTabIndex(tab);
+    togglePanel(tabPanel);
+    tab.setAttribute("aria-selected", true);
+
+    // UPDATE URL FRAGMENT WHEN TAB IS CLICKED
+    history.replaceState(null, '', `#${tab.id}`);
+  });
+});
+
+// Adds hidden class to previously active tabpanel
+const resetHiddenTabPanels = () => {
+  tabPanels.forEach((tabPanel) => {
+    if (!tabPanel.classList.contains("is-hidden")) {
+      tabPanel.classList.add("is-hidden");
+    }
+  });
+};
+
+// Removes border from previously active tab
+const resetActiveTabs = () => {
+  tabsList.forEach((tab) => {
+    if (tab.getAttribute("aria-selected") === "true") {
+      tab.setAttribute("aria-selected", false);
+    }
+  });
+};
+
+const resetTabIndex = (selectedTab) => {
+  tabsList.forEach((tab) => {
+    tab.setAttribute("tabIndex", "-1");
+  });
+  selectedTab.removeAttribute("tabIndex");
+};
+
+const getActiveTab = () => {
+  let selectedTab;
+  tabsList.forEach((tab) => {
+    if (tab.getAttribute("aria-selected") === "true") selectedTab = tab;
+  });
+  return selectedTab;
+};
+
+/* ====================== */
+/* = HANDLE KEY PRESSES = */
+/* ====================== */
+
+const selectRightTab = () => {
+  let newTab;
+  if (tabsList.indexOf(getActiveTab()) + 1 === tabsList.length) {
+    newTab = tabsList[0];
+  } else {
+    newTab = tabsList[tabsList.indexOf(getActiveTab()) + 1];
+  }
+  const tabPanel = document.getElementById(newTab.getAttribute("aria-controls"));
+  resetActiveTabs();
+  resetTabIndex(newTab);
+  togglePanel(tabPanel);
+  newTab.setAttribute("aria-selected", true);
+};
+
+const selectLeftTab = () => {
+  let newTab;
+  if (tabsList.indexOf(getActiveTab()) - 1 < 0) {
+    newTab = tabsList[tabsList.length - 1];
+  } else {
+    newTab = tabsList[tabsList.indexOf(getActiveTab()) - 1];
+  }
+  const tabPanel = document.getElementById(newTab.getAttribute("aria-controls"));
+  resetActiveTabs();
+  resetTabIndex(newTab);
+  togglePanel(tabPanel);
+  newTab.setAttribute("aria-selected", true);
+};
+
+const selectFirstTab = () => {
+  const newTab = tabsList[0];
+  const tabPanel = document.getElementById(newTab.getAttribute("aria-controls"));
+  resetActiveTabs();
+  resetTabIndex(newTab);  
+  togglePanel(tabPanel);
+  newTab.setAttribute("aria-selected", true);
+};
+
+const selectLastTab = () => {
+  const newTab = tabsList[tabsList.length - 1];
+  const tabPanel = document.getElementById(newTab.getAttribute("aria-controls"));
+  resetActiveTabs();
+  resetTabIndex(newTab);
+  togglePanel(tabPanel);
+  newTab.setAttribute("aria-selected", true);
+};
+
+document.addEventListener("keydown", (e) => {
+  switch (e.key) {
+    case "ArrowRight":
+      selectRightTab();
+      break;
+    case "ArrowLeft":
+      selectLeftTab();
+      break;
+    case "Home":
+      selectFirstTab();
+      break;
+    case "End":
+      selectLastTab();
+      break;
+    default:
+      break;
+  }
+});
+
+/* ========================================= */
+/* = DEEP LINKING TO SPECIFIC TAB ON LOAD = */
+/* ========================================= */
+
+const activateTabFromHash = () => {
+  const hash = window.location.hash;
+  if (!hash) return;
+
+  const tab = document.querySelector(`[role="tab"]${hash}`);
+  if (!tab) return;
+
+  const tabPanel = document.getElementById(tab.getAttribute("aria-controls"));
+  resetActiveTabs();
+  resetHiddenTabPanels();
+  resetTabIndex(tab);
+  togglePanel(tabPanel);
+  tab.setAttribute("aria-selected", true);
+};
+
+window.addEventListener("DOMContentLoaded", activateTabFromHash);
+</script>
+
+<script>
+/* ========================================= */
+/* = CLAIMS DIRECTORY AUTOMATION = */
+/* ========================================= */
+
+(async function () {
+  const maxUsers = 100;
+  const users = [];
+  const magicClaims = { Common: [], Uncommon: [], Rare: [], Gift: [] };
+  const creatures = [];
+  const faceClaims = { male: {}, female: {} };
+
+  const requests = Array.from({ length: maxUsers }, (_, i) =>
+    fetch(`index.php?showuser=${i + 1}`)
+      .then(res => res.text())
+      .then(html => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        const fcData = doc.querySelector('.fc-data');
+        const claim = fcData?.getAttribute('data-fc')?.trim();
+        const gender = fcData?.getAttribute('data-gender')?.toLowerCase();
+        const magic = fcData?.getAttribute('data-magic')?.trim();
+	const signet = fcData?.getAttribute('data-signet')?.trim();
+        const species = fcData?.getAttribute('data-species')?.trim();
+        const bonded = fcData?.getAttribute('data-bonded')?.trim();
+
+
+        const wrapper = doc.querySelector('.mainPro')?.className || '';
+        const match = wrapper.match(/mgroup-(\d+)/);
+        const mgroup = match ? parseInt(match[1], 10) : 0;
+
+	const field42 = doc.querySelector('.field-42')?.textContent.trim().toLowerCase();
+	const field45 = doc.querySelector('.field-45')?.textContent.trim();
+	
+	const showRank = (mgroup === 6 || mgroup === 7 || mgroup === 9 || mgroup === 10 || mgroup === 11) &&
+                 (field42 === "frontlines" || field42 === "faculty");
+
+	const name = doc.querySelector('h2')?.textContent.trim().replace(field45, '').trim();
+	const fullName = showRank && field45 ? `${field45} ${name}` : name;
+
+
+        // ========== MAGIC DATA HERE ==========
+        if (mgroup >= 6 && name && magicClaims[magic]) {
+          magicClaims[magic].push({ name, fullName, uid: i + 1, signet });
+        }
+
+        // ========== BONDED DATA HERE ==========
+        if (
+          mgroup >= 6 &&
+          name &&
+          species && species !== '<i>No Information</i>' &&
+          bonded && bonded !== '<i>No Information</i>'
+        ) {
+          creatures.push({ species, bonded, rider: fullName, mgroup, uid: i + 1 });
+        }
+
+        // ========== FACE CLAIM DATA HERE ==========
+        if (mgroup >= 6 && name && claim && gender) {
+          const g = gender.includes('female') ? 'female' : 'male';
+          const letter = claim[0].toUpperCase();
+          if (!faceClaims[g][letter]) faceClaims[g][letter] = [];
+          faceClaims[g][letter].push({ fullName, claim, uid: i + 1 });
+        }
+      })
+      .catch(() => null)
+  );
+
+  await Promise.allSettled(requests);
+
+/* ========================================= */
+/* = FACE CLAIM DIRECTORY = */
+/* ========================================= */
+
+  const buildFaceList = (group) =>
+    Object.keys(group).sort().map(letter => {
+      const items = group[letter]
+        .map(u => `<li><strong>${u.claim}</strong> — <a href="index.php?showuser=${u.uid}">${u.fullName}</a></li>`)
+        .join('');
+      return `<h3>${letter}</h3><ul style="list-style: none; padding-left: 0; text-transform: capitalize;">${items}</ul>`;
+    }).join('');
+
+  document.getElementById('fc-directory').innerHTML = `
+    <div style="display: flex; gap: 2rem;">
+      <div style="flex: 1; max-height: 400px; overflow-y: auto;">
+        <h2>Male Face Claims</h2>
+        ${buildFaceList(faceClaims.male) || '<p>No male claims.</p>'}
+      </div>
+      <div style="flex: 1; max-height: 400px; overflow-y: auto;">
+        <h2>Female Face Claims</h2>
+        ${buildFaceList(faceClaims.female) || '<p>No female claims.</p>'}
+      </div>
+    </div>
+  `;
+
+/* ========================================= */
+/* = MAGIC DIRECTORY = */
+/* ========================================= */
+
+const buildMagicCol = (label, list) => {
+  // Sort alphabetically by name
+  const sortedList = list.sort((a, b) => a.name.localeCompare(b.name));
+
+  const body = sortedList.length
+    ? `<ul style="list-style: none; padding: 0; margin: 0; text-align: left;">${sortedList.map(u => `<li><a href="index.php?showuser=${u.uid}#tab-4">${u.fullName}</a> - ${u.signet}</li>`).join('')}</ul>`
+    : `<p style="margin: 0; font-style: italic;">None claimed yet.</p>`;
+
+  return `<div style="flex: 1; min-width: 200px;"><h3 style="margin-bottom: 0.5rem;">${label}</h3>${body}</div>`;
+};
+
+document.getElementById('magic-directory').innerHTML = `
+  <div style="display: flex; gap: 2rem; justify-content: space-between; align-items: flex-start; flex-wrap: wrap;">
+    ${buildMagicCol("Common Signet", magicClaims.Common)}
+    ${buildMagicCol("Uncommon Signet", magicClaims.Uncommon)}
+    ${buildMagicCol("Rare Signet", magicClaims.Rare)}
+    ${buildMagicCol("Flier Gift", magicClaims.Gift)}
+  </div>
+`;
+
+/* ========================================= */
+/* = BONDED DIRECTORY = */
+/* ========================================= */
+
+const buildCreatureList = (list, label) => {
+  if (!list.length) return `<p>No ${label.toLowerCase()} bonded yet.</p>`;
+  
+  // Sort list by bonded name
+  const sortedList = list.sort((a, b) => a.bonded.localeCompare(b.bonded));
+
+  return `<h2>${label}</h2><ul style="list-style: none; padding-left: 0; text-transform: capitalize;">${
+    sortedList.map(c => `<li><strong>${c.bonded}</strong> — ${c.species} — <a href="index.php?showuser=${c.uid}#tab-4">${c.rider}</a></li>`).join('')
+  }</ul>`;
+};
+
+const dragons = creatures.filter(c => c.mgroup === 6);
+const gryphons = creatures.filter(c => c.mgroup === 7);
+
+document.getElementById('dragon-directory').innerHTML = `
+  <div style="display: flex; gap: 2rem;">
+    <div style="flex: 1; max-height: 400px; overflow-y: auto;">
+      ${buildCreatureList(dragons, 'Dragons')}
+    </div>
+    <div style="flex: 1; max-height: 400px; overflow-y: auto;">
+      ${buildCreatureList(gryphons, 'Gryphons')}
+    </div>
+  </div>
+`;
+})();
+</script>
